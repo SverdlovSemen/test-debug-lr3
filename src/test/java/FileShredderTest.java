@@ -2,6 +2,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,5 +37,26 @@ public class FileShredderTest {
         // 3. Проверяем, что метод вернул true и файла больше нет
         assertTrue(result, "Метод должен вернуть true после удаления");
         assertFalse(tempFile.exists(), "Файл должен физически исчезнуть");
+    }
+
+    @Test
+    void testFileOverwriting() throws IOException {
+        // 1. Создаем файл с секретными данными
+        File tempFile = new File("secret.txt");
+        String originalData = "MY SECRET DATA";
+        Files.writeString(tempFile.toPath(), originalData);
+
+        FileShredder shredder = new FileShredder();
+
+        // 2. Вызываем пока не существующий метод перезаписи
+        shredder.overwrite(tempFile, '0');
+
+        // 3. Читаем файл обратно и проверяем, что там теперь нули
+        String contentAfter = Files.readString(tempFile.toPath());
+        assertNotEquals(originalData, contentAfter);
+        assertTrue(contentAfter.contains("0"));
+
+        // Чистим за собой
+        tempFile.delete();
     }
 }
