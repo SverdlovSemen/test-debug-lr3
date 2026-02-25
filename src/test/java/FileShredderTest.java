@@ -59,4 +59,18 @@ public class FileShredderTest {
         // Чистим за собой
         tempFile.delete();
     }
+
+    @Test
+    void testMultiplePasses() throws IOException {
+        File tempFile = new File("multi_pass_test.txt");
+        Files.writeString(tempFile.toPath(), "TOP SECRET");
+
+        FileShredder shredder = new FileShredder();
+        char[] symbols = {'0', '1', '*'}; // 3 прохода разными символами
+
+        // Вызываем метод с массивом символов
+        shredder.shredWithSymbols(tempFile.getAbsolutePath(), symbols);
+
+        assertFalse(tempFile.exists(), "Файл должен быть удален после всех проходов");
+    }
 }
