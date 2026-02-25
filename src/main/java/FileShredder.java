@@ -5,16 +5,27 @@ import java.io.IOException;
 public class FileShredder {
     public boolean shred(String path) {
         File file = new File(path);
-        if (file.exists()) {
+        if (!file.exists()) return false;
+
+        if (file.isDirectory()) {
+            // Если это папка, получаем список всех файлов внутри
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    // Рекурсивно вызываем уничтожение для каждого элемента
+                    shred(child.getAbsolutePath());
+                }
+            }
+        } else {
+            // Если это файл, сначала затираем его
             try {
-                // Добавляем вызов перезаписи перед удалением
                 overwrite(file, '0');
-                return file.delete();
             } catch (IOException e) {
                 return false;
             }
         }
-        return false;
+        // В конце удаляем сам файл или теперь уже пустую папку
+        return file.delete();
     }
 
     public void overwrite(File file, char symbol) throws IOException {
