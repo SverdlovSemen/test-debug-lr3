@@ -73,4 +73,22 @@ public class FileShredderTest {
 
         assertFalse(tempFile.exists(), "Файл должен быть удален после всех проходов");
     }
+
+    @Test
+    void testDirectoryShredding() throws IOException {
+        // 1. Создаем структуру: Папка -> Файл внутри
+        File tempDir = new File("test_dir");
+        tempDir.mkdir();
+        File fileInDir = new File(tempDir, "inner_file.txt");
+        Files.writeString(fileInDir.toPath(), "Secret in folder");
+
+        FileShredder shredder = new FileShredder();
+
+        // 2. Пытаемся уничтожить папку
+        boolean result = shredder.shred(tempDir.getAbsolutePath());
+
+        // 3. Проверяем результат
+        assertTrue(result, "Метод должен возвращать true для папок");
+        assertFalse(tempDir.exists(), "Папка должна быть удалена полностью");
+    }
 }
