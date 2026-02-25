@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
@@ -13,20 +14,30 @@ public class Main {
         FileShredder shredder = new FileShredder();
 
         System.out.println("--- Бесследный уничтожитель файлов ---");
-        System.out.print("Введите путь к файлу: ");
+        System.out.print("Введите путь (файл или папка): ");
         String path = scanner.nextLine();
 
-        System.out.print("Сколько раз перезаписать файл? ");
-        int passes = scanner.nextInt();
+        File target = new File(path);
+        if (!target.exists()) {
+            System.out.println("Ошибка: Объект не найден по указанному пути.");
+            return;
+        }
+
+        String type = target.isDirectory() ? "папка" : "файл";
+        System.out.println("Обнаружен объект: " + type);
+
+        System.out.print("Введите количество циклов перезаписи: ");
+        int passes = Integer.parseInt(scanner.nextLine());
 
         char[] symbols = new char[passes];
-        for(int i = 0; i < passes; i++) symbols[i] = '0'; // Для простоты забиваем нулями
+        for (int i = 0; i < passes; i++) symbols[i] = (char) ('0' + (i % 10)); // Забиваем разными цифрами
 
         try {
+            System.out.println("Начинаю процесс бесследного уничтожения...");
             shredder.shredWithSymbols(path, symbols);
-            System.out.println("Файл успешно уничтожен.");
+            System.out.println("Успешно! Объект " + type + " и всё его содержимое стерто.");
         } catch (IOException e) {
-            System.err.println("Ошибка при уничтожении: " + e.getMessage());
+            System.out.println("Критическая ошибка при работе: " + e.getMessage());
         }
     }
 }
