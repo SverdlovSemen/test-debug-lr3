@@ -25,4 +25,16 @@ public class FileShredder {
             }
         }
     }
+
+    public void shredWithSymbols(String path, char[] symbols) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) return;
+
+        // //todo: Реализовать логику нескольких проходов для безопасности
+        for (char symbol : symbols) {
+            overwrite(file, symbol);
+        }
+
+        file.delete();
+    }
 }
