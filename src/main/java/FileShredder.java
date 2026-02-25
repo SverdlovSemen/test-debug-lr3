@@ -41,11 +41,24 @@ public class FileShredder {
         File file = new File(path);
         if (!file.exists()) return;
 
-        // //todo: Реализовать логику нескольких проходов для безопасности
-        for (char symbol : symbols) {
-            overwrite(file, symbol);
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    // Рекурсивно затираем всё внутри
+                    shredWithSymbols(child.getAbsolutePath(), symbols);
+                }
+            }
+        } else {
+            // Если это файл — забиваем его символами несколько раз
+            for (char symbol : symbols) {
+                overwrite(file, symbol);
+            }
         }
 
-        file.delete();
+        // Когда содержимое затерто (или если это папка), удаляем объект
+        if (!file.delete()) {
+            throw new IOException("Не удалось удалить объект: " + file.getAbsolutePath());
+        }
     }
 }
